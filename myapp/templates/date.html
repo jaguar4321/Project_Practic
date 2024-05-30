@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Календар
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Календарь</h2>
+    <form method="get" action="{% url 'date_view' %}">
+        <div class="form-group">
+            <label for="date">Выберите дату:</label>
+            <input type="date" id="date" name="date" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary mt-2">Показать посещения</button>
+    </form>
+</div>
+{% endblock %}

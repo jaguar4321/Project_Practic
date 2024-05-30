@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Lesson Visit List
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Список всіх відвідувань</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Date</th>
+                <th>Discipline</th>
+                <th>Lesson</th>
+                <th>Group</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for visit in visitings %}
+            <tr>
+                <td>{{ visit.email }}</td>
+                <td>{{ visit.date }}</td>
+                <td>{{ visit.discipline }}</td>
+                <td>{{ visit.lesson }}</td>
+                <td>{{ visit.group }}</td>
+                <td>{{ visit.group.year }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Список дисциплін
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-4">Список дисциплін</h1>
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">Назва</th>
+                <th scope="col">Скорочено</th>
+                <th scope="col">Групи</th>
+                <th scope="col">Курс</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Ітеруємося по дисциплінам та виводимо інформацію -->
+            {% for discipline in disciplines %}
+            <tr>
+                <td>{{ discipline.name }}</td>
+                <td>{{ discipline.abbrev }}</td>
+                <td>{{ discipline.groups }}</td>
+                <td>{{ discipline.year }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Добавить посещение
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mt-5">Добавити відвідування</h1>
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Добавити</button>
+    </form>
+<!-- Отображение ошибок формы -->
+    {% for field, errors in form.errors.items %}
+        {% if field != '__all__' %}
+            {% for error in errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+    {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    {% endif %}
+    <!-- Конец отображения ошибок формы и сообщения об ошибке -->
+    {% if error_message %}
+        <div class="alert alert-danger">{{ error_message }}</div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block additional_scripts %}
+<!-- Bootstrap Select CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+<!-- Bootstrap Select JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('.selectpicker').selectpicker();
+    });
+</script>
+{% endblock %}

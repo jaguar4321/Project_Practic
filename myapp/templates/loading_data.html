@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+loading_data
+{% endblock %}
+
+{% block content %}
+<h1>Загрузити файл</h1>
+{% if error_message %}
+<div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+<form action="{% url 'loading_data' %}" method="post" enctype="multipart/form-data" class="mt-4">
+    {% csrf_token %}
+    <div class="form-group">
+        {{ form.folder.label_tag }}
+        {{ form.folder }}
+    </div>
+    <div class="form-group">
+        <label for="upload_function">Виберіть де оновити данні:</label>
+        <select name="upload_function" id="upload_function" class="form-control">
+            <option value="Choose processing function">Виберіть де оновити данні</option>
+            <option value="load_data_from_excel">Данні про студентів</option>
+            <option value="load_discipline_from_excel">Данні про дисципліни</option>
+            <option value="load_visiting_from_csv">Данні про відвідування</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Загрузити</button>
+</form>
+{% if success_message %}
+<div class="alert alert-success">{{ success_message }}</div>
+{% endif %}
+<form method="post" action="{% url 'flush_database' %}" class="d-inline">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger btn-sm float-right">Очистити базу даних</button>
+</form>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Students List
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Groups</h1>
+    <div id="accordion">
+        {% for group in groups %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">{{ group.name }} - курс {{ group.year }}</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group">
+                    {% for student in students %}
+                    {% if student.group == group %}
+                    <li class="list-group-item">{{ student.full_name }} - {{ student.email }}</li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
