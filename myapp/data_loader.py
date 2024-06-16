@@ -164,7 +164,7 @@ def load_visiting_from_csv(filename):
                     continue
 
                 if in_participants_section and row:
-                    if len(row) >= 6 and row[5] == 'Attendee':
+                    if len(row) >= 6 and (row[5] == 'Attendee' or row[5] == 'Presenter'):
                         attendee_data.append(row[4])
     except FileNotFoundError:
         errors.append(f"Неможливо відкрити файл: {filename}")
