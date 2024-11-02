@@ -1,9 +1,37 @@
 from django.db import models
 from django.db import IntegrityError
+# from django.contrib.auth.models import AbstractUser
+
+class Institute(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Назва інституту")
+    abbrev = models.CharField(max_length=255, verbose_name="Скорочена назва")
+
+    def __str__(self):
+        return self.name
+
+
+class Department(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Назва кафедри")
+    institute = models.ForeignKey(Institute, on_delete=models.CASCADE, related_name='departments',
+                                  verbose_name="Інститут")
+
+    def __str__(self):
+        return self.name
+
+
+class Specialty(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Назва спеціальності")
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='specialties', verbose_name="Кафедра")
+
+    def __str__(self):
+        return self.name
+
 
 class Group(models.Model):
     name = models.CharField(max_length=100, unique=True)
     year = models.CharField(max_length=100)
+    specialty = models.ForeignKey(Specialty, on_delete=models.SET_NULL, null=True, blank=True, related_name='groups',
+                                  verbose_name="Спеціальність")
 
     def __str__(self):
         return self.name
@@ -36,17 +64,15 @@ class Lesson_visit(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='visiting', default=None)
 
     def save(self, *args, **kwargs):
-        # Поиск студента по его email
         student = self.email
         if student:
-            # Получение группы студента
             group = student.group
             if group:
-                self.group = group  # Установка найденной группы в поле group
+                self.group = group
 
                 discipline_groups = [g.strip() for g in self.discipline.groups.split(',')]
                 if group.name not in discipline_groups:
-                    raise IntegrityError(f"Группа {group.name} не указана для дисциплины {self.discipline.name}.")
+                    raise IntegrityError(f"Дисципліна {self.discipline.name} не викладається для цієї групи {group.name}.")
         super().save(*args, **kwargs)
 
     def course(self):
@@ -57,4 +83,17 @@ class Lesson_visit(models.Model):
 
     class Meta:
         unique_together = ('email', 'date', 'discipline', 'lesson')
+
+
+class LoadingData(models.Model):
+    class Meta:
+        verbose_name = "Loading Data"
+        verbose_name_plural = "Loading Data"
+
+
+
+
+
+
+
 

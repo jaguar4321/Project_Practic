@@ -51,6 +51,7 @@ def create_excel_template(discipline, groups):
     for group in groups:
         students = Student.objects.filter(group__name=group).order_by('group__name', 'id')
         for student in students:
+
             if student.id not in student_numbers:
                 student_numbers[student.id] = len(student_numbers) + 4
             row_data = [len(student_numbers), student.group.name, student.full_name]
@@ -64,6 +65,7 @@ def create_excel_template(discipline, groups):
     # Получаем все уникальные даты лекций по данной дисциплине и группам
     all_dates = Lesson_visit.objects.filter(discipline=discipline, group__name__in=groups).values_list('date',
                                                                                                        flat=True).distinct()
+    # print(all_dates)
     column = 4
     for date in all_dates:
         formatted_date = date.strftime('%d/%m')

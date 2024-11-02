@@ -9,11 +9,12 @@
     <h1 class="mt-5">Добавити відвідування</h1>
     <form method="post">
         {% csrf_token %}
-
         {{ form.as_p }}
+
         <button type="submit" class="btn btn-primary">Добавити</button>
     </form>
-<!-- Отображение ошибок формы -->
+
+    <!-- Отображение ошибок формы -->
     {% for field, errors in form.errors.items %}
         {% if field != '__all__' %}
             {% for error in errors %}
@@ -26,7 +27,7 @@
             <div class="alert alert-danger">{{ error }}</div>
         {% endfor %}
     {% endif %}
-    <!-- Конец отображения ошибок формы и сообщения об ошибке -->
+<br>
     {% if error_message %}
         <div class="alert alert-danger">{{ error_message }}</div>
     {% endif %}

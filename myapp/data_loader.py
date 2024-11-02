@@ -60,7 +60,7 @@ def load_data_from_excel(file_path):
     sheet_names = xl.sheet_names
     errors = []
     try:
-        with transaction.atomic():  # Обернем в транзакцию для сохранения целостности данных
+        with transaction.atomic():
             for sheet_name in sheet_names:
                 try:
                     data = pd.read_excel(file_path, sheet_name=sheet_name, header=None, dtype=str)
@@ -70,7 +70,7 @@ def load_data_from_excel(file_path):
                         try:
                             if not row[0].isdigit():
                                 group_name, group_year = row[0].split(' - курс ')
-                                group_object, _ = Group.objects.get_or_create(name=group_name, year=group_year)
+                                group_object, _ = Group.objects.get_or_create(name=group_name, year=group_year, specialty=None)
                             else:
                                 full_name = row[1]
                                 email = str(row[2])
@@ -79,7 +79,7 @@ def load_data_from_excel(file_path):
                                         student = Student.objects.get(email=email)
                                     except Student.DoesNotExist:
                                         student = Student.objects.create(full_name=full_name, group=group_object, email=email)
-                                        student.save()  # Вызываем save(), чтобы сработал сигнал
+                                        student.save()
                         except Exception as e:
                             errors.append(f"Error processing data in sheet '{sheet_name}': {str(e)}")
                 except Exception as e:

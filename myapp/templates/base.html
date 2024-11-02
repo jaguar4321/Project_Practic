@@ -30,11 +30,23 @@
                 <a class="nav-link" href="{% url 'visiting_list' %}">Всі Відвідування</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'loading_data' %}">Оновити Дані</a>
+                <a class="nav-link" href="{% url 'loading_data_user' %}">Загрузити данні про відвідування</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'calendar' %}">Календар</a>
+                <a class="nav-link" href="{% url 'lesson_visit_filter' %}">Фільтр</a>
             </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+                <span class="nav-link">{{ user.email }} |
+                    <form id="logout-form" action="{% url 'logout' %}" method="POST" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" style="background: none; border: none; padding: 0; color: inherit; cursor: pointer;">Выйти</button>
+                    </form>
+                </span>
+            </li>
+            {% endif %}
         </ul>
     </div>
 </nav>
@@ -47,6 +59,8 @@
         <p>Після того, як ви завантажили дані, звіт у форматі Excel можна завантажити в розділі "Завантажити Звіт".</p>
         <p>Подивитися дані, які були завантажені, можна в розділах: "Всі Студенти", "Всі Дисципліни" та "Всі Відвідування".</p>
     </div>
+
+
     {% endblock %}
 </main>
 
