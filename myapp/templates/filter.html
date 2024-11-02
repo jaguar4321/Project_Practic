@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Фильтр посещений студентов
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Фильтр посещений студентов</h1>
+    <form method="get" class="mb-4">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Применить фильтр</button>
+    </form>
+
+
+    <a href="{% url 'add_visit' %}?{{ request.GET.urlencode }}" class="btn btn-primary mt-3">Добавить посещение</a>
+
+
+
+    <h2>Посещения студентов</h2>
+    {% if visits %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Студент</th>
+                    <th>Дата</th>
+                    <th>Дисциплина</th>
+                    <th>Занятие</th>
+                    <th>Группа</th>
+                    <th>Удалить</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for visit in visits %}
+                    <tr>
+                        <td>{{ visit.email }}</td>
+                        <td>{{ visit.date }}</td>
+                        <td>{{ visit.discipline }}</td>
+                        <td>{{ visit.lesson }}</td>
+                        <td>{{ visit.group }}</td>
+                        <td>
+                            <form method="post" action="{% url 'delete_visit' visit.id %}?{{ request.GET.urlencode }}">
+                                {% csrf_token %}
+                                <input type="hidden" name="student" value="{{ request.GET.student }}">
+                                <input type="hidden" name="group" value="{{ request.GET.group }}">
+                                <input type="hidden" name="course" value="{{ request.GET.course }}">
+                                <input type="hidden" name="discipline" value="{{ request.GET.discipline }}">
+                                <input type="hidden" name="date" value="{{ request.GET.date }}">
+                                <button type="submit" class="btn btn-danger btn-sm">-</button>
+                            </form>
+
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Нет посещений для отображения.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block additional_scripts %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('.selectpicker').selectpicker();
+    });
+</script>
+{% endblock %}

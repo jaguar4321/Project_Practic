@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}
+loading_data
+{% endblock %}
+
+{% block content %}
+<h1>Загрузити файл</h1>
+{% if error_message %}
+<div class="alert alert-danger">{{ error_message }}</div>
+{% endif %}
+<form action="{% url 'loading_data_user' %}" method="post" enctype="multipart/form-data" class="mt-4">
+    {% csrf_token %}
+    <div class="form-group">
+        {{ form.folder.label_tag }}
+        {{ form.folder }}
+    </div>
+    <button type="submit" class="btn btn-primary">Загрузити</button>
+</form>
+{% if success_message %}
+<div class="alert alert-success">{{ success_message }}</div>
+{% endif %}
+
+{% endblock %}
