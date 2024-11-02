@@ -15,4 +15,6 @@ urlpatterns = [
     path('add_visit/', views.add_visit, name='add_visit'),
     path('flush_database/', views.flush_database, name='flush_database'),
     path('lesson-visit-filter/', views.lesson_visit_filter, name='lesson_visit_filter'),
+    path('visit-analysis/', views.visit_analysis, name='visit_analysis'),
+    path('generate-report/', views.generate_pdf_report, name='generate_pdf_report')
 ]

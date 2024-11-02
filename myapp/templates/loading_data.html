@@ -5,7 +5,7 @@ loading_data
 {% endblock %}
 
 {% block content %}
-<h1>Загрузити файл</h1>
+<h1>Завантажити файл</h1>
 {% if error_message %}
 <div class="alert alert-danger">{{ error_message }}</div>
 {% endif %}
@@ -22,9 +22,10 @@ loading_data
             <option value="load_data_from_excel">Данні про студентів</option>
             <option value="load_discipline_from_excel">Данні про дисципліни</option>
             <option value="load_visiting_from_csv">Данні про відвідування</option>
+            <option value="load_specialties_from_excel">Данні про спеціальності</option>
         </select>
     </div>
-    <button type="submit" class="btn btn-primary">Загрузити</button>
+    <button type="submit" class="btn btn-primary">Завантажити</button>
 </form>
 {% if success_message %}
 <div class="alert alert-success">{{ success_message }}</div>

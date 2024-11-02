@@ -70,7 +70,7 @@ def load_data_from_excel(file_path):
                         try:
                             if not row[0].isdigit():
                                 group_name, group_year = row[0].split(' - курс ')
-                                group_object, _ = Group.objects.get_or_create(name=group_name, year=group_year, specialty=None)
+                                group_object, _ = Group.objects.get_or_create(name=group_name, year=group_year)
                             else:
                                 full_name = row[1]
                                 email = str(row[2])
@@ -95,37 +95,59 @@ def load_discipline_from_excel(file_path):
     xl = pd.ExcelFile(file_path)
     sheet_names = xl.sheet_names
 
-    columns_needed = ['Назва учбової дисципліни', 'Скор', 'Групи', 'Курс']
+    columns_needed = [
+        'Назва учбової дисципліни',
+        'Скор',
+        'Групи',
+        'Курс',
+    ]
 
     disciplines_to_create = {}
     errors = []
 
     for sheet_name in sheet_names:
         try:
-            df = pd.read_excel(file_path, sheet_name=sheet_name, skiprows=5)
-            df = df[columns_needed]
-            df = df.iloc[1:]
+
+            df = pd.read_excel(file_path, sheet_name=sheet_name, header=[5, 6])
+
+            second_level_columns = df.columns.get_level_values(1)
+
+            df.columns = df.columns.get_level_values(0)
+
+            missing_columns = [col for col in columns_needed if col not in df.columns]
+            if missing_columns:
+                errors.append(f"Missing columns: {missing_columns}")
+                continue
+
+
             for index, row in df.iterrows():
                 score = str(row['Скор']).strip()
                 course = int(row['Курс'])
-                score_and_course = (score, course)
-                groups = ', '.join(
-                    str(g) for g in str(row['Групи']).split(',') if g.strip())
+                groups = ', '.join(str(g) for g in str(row['Групи']).split(',') if g.strip())
+                total = row[second_level_columns == 'Всього'].values[0]
 
+
+                print(f"Дисципліна: {row['Назва учбової дисципліни']}, Всього: {total}")
+
+
+                score_and_course = (score, course)
                 if score_and_course not in disciplines_to_create:
                     disciplines_to_create[score_and_course] = {
                         'name': row['Назва учбової дисципліни'],
                         'abbrev': score,
                         'groups': groups,
-                        'year': course
+                        'year': course,
+                        'total_time': total
                     }
                 else:
                     existing_groups = set(disciplines_to_create[score_and_course]['groups'].split(', '))
                     new_groups = set(groups.split(', '))
                     all_groups = existing_groups.union(new_groups)
                     disciplines_to_create[score_and_course]['groups'] = ', '.join(all_groups)
+
         except Exception as e:
             errors.append(str(e))
+
 
     for score_and_course, discipline_data in disciplines_to_create.items():
         try:
@@ -144,6 +166,7 @@ def load_discipline_from_excel(file_path):
                         Discipline.objects.create(**discipline_data)
         except IntegrityError as e:
             errors.append(str(e))
+
     xl.close()
     return errors
 
@@ -208,6 +231,62 @@ def load_visiting_from_csv(filename):
     return errors
 
 
+#  обробка файлу із переліком спеціальностей, кафедр, відповідно групам
+def load_specialties_from_excel(file_path):
+
+    df = pd.read_excel(file_path)
+    print(df)
+    # Проверяем, содержит ли DataFrame "Група"
+    if 'Група' not in df.columns or df['Група'].str.contains('Бакалаврат').any() is False:
+        print("Группа 'Бакалаврат' не найдена в файле Excel.")
+        return
+
+    institute_name = df['Інститут'].dropna().iloc[0] if not df['Інститут'].dropna().empty else None
+    if institute_name:
+        institute, _ = Institute.objects.get_or_create(name=institute_name)  # Создаем или получаем объект Institute
+        print(f"Загружается информация для института: {institute_name}")
+    else:
+        print("Не найдено значение для 'Інститут' в файле.")
+        return
+
+
+    # Начинаем транзакцию для целостности данных
+    with transaction.atomic():
+        for index, row in df.iterrows():
+            group_name = row['Група']
+
+            # Пропускаем строки с "Бакалаврат" и пустые строки
+            if group_name == 'Бакалаврат' or pd.isnull(group_name):
+                continue
+
+            specialty_name = row['Спеціальність']
+            department_name = row['Кафедра']
+
+
+            # Находим первую 'x' и извлекаем префикс
+            x_index = group_name.find('x')
+            prefix = group_name[:x_index-1]  # Все символы до первой 'x'
+
+            # Считаем количество цифр в group_name
+            length_required = sum(1 for char in group_name if char.isdigit() or char == 'х')
+
+            # Получаем или создаём специальность
+            specialty, _ = Specialty.objects.get_or_create(name=specialty_name)
+
+            # Получаем или создаём кафедру
+            department, _ = Department.objects.get_or_create(name=department_name, institute=institute)
+            # Ищем группы, которые начинаются с извлеченного префикса
+            matching_groups = Group.objects.filter(name__startswith=prefix)
+            if matching_groups:
+                for group in matching_groups:
+                    # Проверяем, совпадает ли количество цифр с требуемым и начинается ли название с prefix
+                    if sum(1 for char in group.name if char.isdigit()) == length_required and group.name.startswith(prefix):
+                        # Добавляем специальность к группе
+                        group.specialties.add(
+                            SpecialtyDepartment.objects.get_or_create(specialty=specialty, department=department)[0])
+                        print(f"Добавлена специальность '{specialty_name}' в группу '{group.name}'.")
+
+    print("Специальности загружены успешно.")
 
 
 

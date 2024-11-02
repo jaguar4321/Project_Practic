@@ -5,7 +5,7 @@ loading_data
 {% endblock %}
 
 {% block content %}
-<h1>Загрузити файл</h1>
+<h1>Завантажити файл</h1>
 {% if error_message %}
 <div class="alert alert-danger">{{ error_message }}</div>
 {% endif %}
@@ -15,7 +15,7 @@ loading_data
         {{ form.folder.label_tag }}
         {{ form.folder }}
     </div>
-    <button type="submit" class="btn btn-primary">Загрузити</button>
+    <button type="submit" class="btn btn-primary">Завантажити</button>
 </form>
 {% if success_message %}
 <div class="alert alert-success">{{ success_message }}</div>

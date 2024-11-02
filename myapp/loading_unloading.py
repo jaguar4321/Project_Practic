@@ -28,28 +28,23 @@ def handle_uploaded_folder(folder, process_function):
 
 def download_file(request, file_path):
     if file_path:
-        # Проверяем, существует ли файл по указанному пути
+
         if os.path.exists(file_path):
-            # Определяем MIME-тип файла
             mime_type, _ = mimetypes.guess_type(file_path)
             if not mime_type:
                 mime_type = 'application/octet-stream'
 
-            # Открываем файл для скачивания
             with open(file_path, 'rb') as file:
                 response = HttpResponse(file.read(), content_type=mime_type)
-                # Устанавливаем заголовок Content-Disposition для предложения сохранить файл
                 response['Content-Disposition'] = 'attachment; filename="%s"' % os.path.basename(file_path)
             return response
         else:
-            # Возвращаем сообщение об ошибке, если файл не найден
             response = HttpResponse("File not found.")
-            response.status_code = 404  # Устанавливаем код состояния 404 (файл не найден)
+            response.status_code = 404
             return response
     else:
-        # Возвращаем сообщение об ошибке, если путь к файлу не указан
         response = HttpResponse("File path is not provided.")
-        response.status_code = 400  # Устанавливаем код состояния 400 (некорректный запрос)
+        response.status_code = 400
         return response
 
 

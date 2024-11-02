@@ -6,15 +6,12 @@ import os
 
 def create_excel_template(discipline, groups):
     file_name = 'excel_template.xlsx'
-    # Проверяем существует ли файл
     if os.path.exists(file_name):
         os.remove(file_name)
         print(f"Старый файл {file_name} удален.")
 
-    # Создаем новую книгу Excel
     wb = Workbook()
 
-    # Добавляем новый лист
     ws = wb.active
 
     ws.freeze_panes = 'D4'
@@ -28,8 +25,6 @@ def create_excel_template(discipline, groups):
                          bottom=Side(style='thin'))
 
     center_alignment = Alignment(horizontal='center')
-
-    # fill = PatternFill(start_color="FFFF00", end_color="FFFF00", fill_type="solid")
 
     ws.append([''] * 3)
     ws.append([''] * 3)

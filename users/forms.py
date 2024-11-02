@@ -10,8 +10,7 @@ class CustomUserCreationForm(UserCreationForm):
         required=True,
         label="Кафедри",
         widget=forms.SelectMultiple(attrs={
-            'class': 'form-control',  # Добавьте классы Bootstrap
-            'placeholder': 'Выберите кафедры',  # Плейсхолдер (можно убрать)
+            'class': 'form-control',
         })
     )
 

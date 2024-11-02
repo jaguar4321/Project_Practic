@@ -1,33 +1,32 @@
 {% extends 'base.html' %}
 
 {% block title %}
-Фильтр посещений студентов
+Фільтр відвідувань студентів
 {% endblock %}
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Фильтр посещений студентов</h1>
+    <h1>Фільтр відвідувань студентів</h1>
     <form method="get" class="mb-4">
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Применить фильтр</button>
+        <button type="submit" class="btn btn-primary">Застосувати фільтр</button>
     </form>
 
+    <a href="{% url 'add_visit' %}?{{ request.GET.urlencode }}" class="btn btn-primary mt-3">Додати відвідування</a>
 
-    <a href="{% url 'add_visit' %}?{{ request.GET.urlencode }}" class="btn btn-primary mt-3">Добавить посещение</a>
+    <a href="?{{ request.GET.urlencode }}&download_pdf=true" class="btn btn-secondary mt-3">Скачати звіт у форматі PDF</a>
 
-
-
-    <h2>Посещения студентов</h2>
+    <h2>Відвідування студентів</h2>
     {% if visits %}
         <table class="table table-bordered">
             <thead>
                 <tr>
                     <th>Студент</th>
                     <th>Дата</th>
-                    <th>Дисциплина</th>
-                    <th>Занятие</th>
-                    <th>Группа</th>
-                    <th>Удалить</th>
+                    <th>Дисципліна</th>
+                    <th>Заняття</th>
+                    <th>Група</th>
+                    <th>Видалити</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,24 +47,40 @@
                                 <input type="hidden" name="date" value="{{ request.GET.date }}">
                                 <button type="submit" class="btn btn-danger btn-sm">-</button>
                             </form>
-
                         </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <p>Нет посещений для отображения.</p>
+        <p>Немає відвідувань для відображення.</p>
     {% endif %}
 </div>
 {% endblock %}
 
 {% block additional_scripts %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
 <script>
-    $(document).ready(function(){
-        $('.selectpicker').selectpicker();
+$(document).ready(function() {
+    // Инициализируем selectpicker
+    $('.selectpicker').selectpicker();
+
+    // Слушаем изменения в селекте
+    $('.selectpicker').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        var $select = $(this);
+        var selectedOptions = $select.find('option:selected');
+
+        // Перемещаем выбранные элементы в верх списка
+        selectedOptions.each(function() {
+            var option = $(this);
+            // Убираем текущий элемент из списка
+            option.detach();
+            // Вставляем его в начало списка
+            $select.prepend(option);
+        });
+
+        // Переинициализируем selectpicker, чтобы обновить отображение
+        $select.selectpicker('refresh');
     });
+});
 </script>
 {% endblock %}

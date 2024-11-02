@@ -3,7 +3,6 @@ from django.urls import path
 from .models import *
 from .views import loading_data
 
-
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     list_display = ('name', 'year')
@@ -12,7 +11,7 @@ class GroupAdmin(admin.ModelAdmin):
 
 @admin.register(Discipline)
 class DisciplineAdmin(admin.ModelAdmin):
-    list_display = ('name', 'abbrev', 'groups', 'year')
+    list_display = ('name', 'abbrev', 'groups', 'year', 'total_time')
     search_fields = ('name', 'abbrev')
 
 
@@ -36,16 +35,21 @@ class InstituteAdmin(admin.ModelAdmin):
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'institute')
+    list_display = ('name', 'institute',)
     list_filter = ('institute',)
     search_fields = ('name',)
 
 
 @admin.register(Specialty)
 class SpecialtyAdmin(admin.ModelAdmin):
-    list_display = ('name', 'department')
-    list_filter = ('department',)
+    list_display = ('name',)
     search_fields = ('name',)
+
+
+@admin.register(SpecialtyDepartment)
+class SpecialtyDepartmentAdmin(admin.ModelAdmin):
+    list_display = ('specialty', 'department')
+    search_fields = ('specialty__name', 'department__name')
 
 
 class LoadingDataAdmin(admin.ModelAdmin):
@@ -57,6 +61,5 @@ class LoadingDataAdmin(admin.ModelAdmin):
             path('loading-data/', self.admin_site.admin_view(loading_data), name='loading_data'),
         ]
         return custom_urls + urls
-
 
 admin.site.register(LoadingData, LoadingDataAdmin)

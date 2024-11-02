@@ -24,7 +24,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-    departments = models.ManyToManyField(Department, blank=True, related_name='users')  # Изменено с ForeignKey на ManyToManyField
+    departments = models.ManyToManyField(Department, blank=True, related_name='users')
 
     objects = CustomUserManager()
 

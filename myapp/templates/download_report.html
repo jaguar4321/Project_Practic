@@ -12,7 +12,6 @@ Download Report
             {% csrf_token %}
             {{ form.as_p }}
 
-            <!-- Скрытые поля для передачи name и year -->
             <input type="hidden" name="name" value="{{ name }}">
             <input type="hidden" name="year" value="{{ year }}">
 
@@ -24,13 +23,11 @@ Download Report
         <form method="post" action="{% url 'download_report' %}" class="mb-4">
             {% csrf_token %}
             <select class="selectpicker" name="groups" multiple data-live-search="true">
-                <!-- Проверяем, есть ли группы для выбора -->
                 {% for group in groups %}
                     <option value="{{ group }}">{{ group }}</option>
                 {% endfor %}
             </select>
 
-            <!-- Скрытые поля для передачи name и year -->
             <input type="hidden" name="name" value="{{ name }}">
             <input type="hidden" name="year" value="{{ year }}">
 
@@ -45,11 +42,4 @@ Download Report
 {% endblock %}
 
 {% block additional_scripts %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
-<script>
-    $(document).ready(function(){
-        $('.selectpicker').selectpicker();
-    });
-</script>
 {% endblock %}

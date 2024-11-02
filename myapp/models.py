@@ -21,17 +21,31 @@ class Department(models.Model):
 
 class Specialty(models.Model):
     name = models.CharField(max_length=255, verbose_name="Назва спеціальності")
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='specialties', verbose_name="Кафедра")
 
     def __str__(self):
         return self.name
 
 
+class SpecialtyDepartment(models.Model):
+    specialty = models.ForeignKey(
+        Specialty, on_delete=models.CASCADE, related_name='departments', verbose_name="спеціальність"
+    )
+    department = models.ForeignKey(
+        Department, on_delete=models.CASCADE, related_name='specialties', verbose_name="Кафедра"
+    )
+
+    class Meta:
+        unique_together = ('specialty', 'department')
+
+    def __str__(self):
+        return f"{self.specialty} - {self.department}"
+
+
 class Group(models.Model):
     name = models.CharField(max_length=100, unique=True)
     year = models.CharField(max_length=100)
-    specialty = models.ForeignKey(Specialty, on_delete=models.SET_NULL, null=True, blank=True, related_name='groups',
-                                  verbose_name="Спеціальність")
+    specialties = models.ManyToManyField(
+        SpecialtyDepartment, blank=True, related_name='groups', verbose_name="Спеціальності")
 
     def __str__(self):
         return self.name
@@ -42,6 +56,7 @@ class Discipline(models.Model):
     abbrev = models.CharField(max_length=100)
     groups = models.CharField(max_length=100)
     year = models.CharField(max_length=100)
+    total_time = models.IntegerField(max_length=20)
 
     def __str__(self):
         return self.name
@@ -79,7 +94,7 @@ class Lesson_visit(models.Model):
         return self.group.year
 
     def __str__(self):
-        return self.email
+        return f"{self.email}"
 
     class Meta:
         unique_together = ('email', 'date', 'discipline', 'lesson')
