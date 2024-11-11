@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчет по посещаемости</title>
+    <style>
+        /* Указываем шрифт через @font-face */
+        @font-face {
+            font-family: "DejaVu Sans"; /* Имя шрифта */
+            src: url("{% static 'fonts/DejaVuSans.ttf' %}") format("truetype"); /* Путь к файлу шрифта */
+        }
+
+        /* Используем указанный шрифт в body */
+        body {
+            font-family: "DejaVu Sans", "Arial", "Times New Roman", sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Отчет по посещаемости</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Студент</th>
+                <th>Группа</th>
+                <th>Дисциплина</th>
+                <th>Урок</th>
+                <th>Дата</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for visit in visits %}
+            <tr>
+                <td>{{ visit.email.full_name }}</td>
+                <td>{{ visit.group.name }}</td>
+                <td>{{ visit.discipline.name }}</td>
+                <td>{{ visit.lesson }}</td>
+                <td>{{ visit.date }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
