@@ -1,0 +1,22 @@
+{% extends 'users/base.html' %}
+{% load bootstrap %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Реєстрація</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.email|bootstrap }}
+        <div class="form-group">
+            <label for="{{ form.departments.id_for_label }}">{{ form.departments.label }}</label>
+            {{ form.departments }}
+        </div>
+        {{ form.password1|bootstrap }}
+        {{ form.password2|bootstrap }}
+
+        <br>
+        <button type="submit" class="btn btn-primary">Зареєструватися</button>
+    </form>
+</div>
+{% endblock %}
+

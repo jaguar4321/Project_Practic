@@ -21,5 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('select2/', include('django_select2.urls')),
     path('', include("myapp.urls")),
+    path('users/', include('users.urls')),
 
 ]

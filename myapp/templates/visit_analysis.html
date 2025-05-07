@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Діаграми{% endblock %}
+
+{% block content %}
+    <form method="get" class="mb-4">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Застосувати фільтр</button>
+    </form>
+
+    {% if chart %}
+        {{ chart|safe }}
+    {% else %}
+        <p>Виберіть параметри, тип діаграми та тип даних для відображення.</p>
+    {% endif %}
+
+
+
+{% endblock %}
+
+{% block additional_scripts %}
+<script>
+$(document).ready(function() {
+    // Инициализируем selectpicker
+    $('.selectpicker').selectpicker();
+
+    // Функция для сохранения порядка выбранных элементов в sessionStorage
+    function saveSelectedOrder(select) {
+        var selectId = select.attr('id') || select.attr('name'); // Используем id или name как ключ
+        var selectedValues = select.find('option:selected').map(function() {
+            return $(this).val();
+        }).get();
+        sessionStorage.setItem('selectOrder_' + selectId, JSON.stringify(selectedValues));
+    }
+
+    // Функция для восстановления порядка опций
+    function restoreSelectedOrder(select) {
+        var selectId = select.attr('id') || select.attr('name');
+        var savedOrder = sessionStorage.getItem('selectOrder_' + selectId);
+        if (savedOrder) {
+            var selectedValues = JSON.parse(savedOrder);
+            var $options = select.find('option');
+            var $selectedOptions = $options.filter(function() {
+                return selectedValues.includes($(this).val());
+            });
+            var $unselectedOptions = $options.filter(function() {
+                return !selectedValues.includes($(this).val());
+            });
+
+            // Перемещаем выбранные опции в начало в порядке из savedOrder
+            select.empty();
+            selectedValues.forEach(function(value) {
+                var $option = $selectedOptions.filter('[value="' + value + '"]');
+                select.append($option);
+            });
+            $unselectedOptions.each(function() {
+                select.append($(this));
+            });
+
+            // Обновляем selectpicker
+            select.selectpicker('refresh');
+        }
+    }
+
+    // Восстанавливаем порядок для всех selectpicker при загрузке страницы
+    $('.selectpicker').each(function() {
+        restoreSelectedOrder($(this));
+    });
+
+    // Слушаем изменения в селекте
+    $('.selectpicker').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        var $select = $(this);
+        var selectedOptions = $select.find('option:selected');
+
+        // Перемещаем выбранные элементы в верх списка
+        selectedOptions.each(function() {
+            var option = $(this);
+            option.detach();
+            $select.prepend(option);
+        });
+
+        // Сохраняем порядок в sessionStorage
+        saveSelectedOrder($select);
+
+        // Переинициализируем selectpicker
+        $select.selectpicker('refresh');
+    });
+});
+</script>
+{% endblock %}
+
+
+

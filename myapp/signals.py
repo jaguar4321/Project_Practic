@@ -5,4 +5,4 @@ from .models import *
 
 @receiver(pre_save, sender=Student)
 def normalize_email(sender, instance, **kwargs):
-    instance.email = instance.email.lower()  # Приводим email к нижнему регистру перед сохранением
+    instance.email = instance.email.lower()

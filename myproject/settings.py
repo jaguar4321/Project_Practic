@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,8 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'myapp',
+    'users',
     'django_select2',
     'django_extensions',
+    'django.contrib.sites',
+    'bootstrapform',
+
 ]
 
 MIDDLEWARE = [
@@ -49,7 +54,6 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
 ROOT_URLCONF = 'myproject.urls'
@@ -57,7 +61,9 @@ ROOT_URLCONF = 'myproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates')
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,12 +112,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'uk'
+TIME_ZONE = 'Europe/Kyiv'
 
-TIME_ZONE = 'UTC'
+LANGUAGES = [
+    ('uk', 'Ukrainian'),
+    ('en', 'English'),
+]
 
 USE_I18N = True
-
+# LOCALE_PATHS = [BASE_DIR / 'locale']
 USE_TZ = True
 
 
@@ -130,8 +140,39 @@ else:
 
     STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+AUTH_USER_MODEL = 'users.CustomUser'
+
+SITE_ID = 1
+
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/users/login/'
+LOGIN_URL = '/users/login/'
+ACCOUNT_SIGNUP_REDIRECT_URL = '/'
+
+# Email backend (можете использовать SMTP или консоль для отладки)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+JAZZMIN_SETTINGS = {
+    "site_title": "Моя адмінка",
+    "site_header": "Адмін-панель",
+    "site_brand": "Attendance",
+    "welcome_sign": "Ласкаво просимо!",
+    "show_ui_builder": True,
+    "topmenu_links": [
+        {"name": "Головна", "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Підтримка", "url": "https://example.com", "new_window": True},
+    ],
+    "theme": "darkly",  # Темы: flatly, darkly, cerulean и др.
+}

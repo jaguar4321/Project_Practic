@@ -5,30 +5,173 @@ loading_data
 {% endblock %}
 
 {% block content %}
-<h1>Загрузити файл</h1>
-{% if error_message %}
-<div class="alert alert-danger">{{ error_message }}</div>
-{% endif %}
-<form action="{% url 'loading_data' %}" method="post" enctype="multipart/form-data" class="mt-4">
-    {% csrf_token %}
-    <div class="form-group">
-        {{ form.folder.label_tag }}
-        {{ form.folder }}
+<div class="container mt-5">
+    <h1 class="mb-4">Завантажити файл</h1>
+
+    {% if errors %}
+    {% with has_errors=False %}
+        {% for key, value in errors.items %}
+            {% if value %}
+                {% if not has_errors %}
+                    <div class="alert alert-danger">
+                        <h4>Виникли помилки при обробці файлу:</h4>
+                        <ul>
+                    {% endif %}
+                    {% if key == 'file_errors' and value %}
+                        <li><strong>Помилки файлу:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'format_errors' and value %}
+                        <li><strong>Помилки формату файлу:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'discipline_errors' and value %}
+                        <li><strong>Помилки дисципліни:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'student_errors' and value %}
+                        <li><strong>Помилки студентів:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'visit_errors' and value %}
+                        <li><strong>Помилки відвідувань:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'archive_errors' and value %}
+                        <li><strong>Помилки архіву:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'cleanup_errors' and value %}
+                        <li><strong>Помилки очищення:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'sheet_errors' and value %}
+                        <li><strong>Помилки аркушів Excel:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'column_errors' and value %}
+                        <li><strong>Помилки стовпців:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'data_errors' and value %}
+                        <li><strong>Помилки обробки даних:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'institute_errors' and value %}
+                        <li><strong>Помилки інституту:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'specialty_errors' and value %}
+                        <li><strong>Помилки спеціальностей:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if not has_errors %}
+                        {% with has_errors=True %}{% endwith %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if has_errors %}
+                        </ul>
+                    </div>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+    <form action="{% url 'loading_data' %}" method="post" enctype="multipart/form-data" class="mt-4">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.folder.label_tag }}
+            {{ form.folder }}
+        </div>
+        <div class="form-group">
+            <label for="upload_function">Виберіть де оновити данні:</label>
+            <select name="upload_function" id="upload_function" class="form-control">
+                <option value="Choose processing function">Виберіть де оновити данні</option>
+                <option value="load_data_from_excel">Данні про студентів</option>
+                <option value="load_discipline_from_excel">Данні про дисципліни</option>
+                <option value="load_visiting_from_csv">Данні про відвідування</option>
+                <option value="load_specialties_from_excel">Данні про спеціальності</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Завантажити</button>
+    </form>
+    {% if success_message %}
+    <div class="alert alert-success mt-4">
+        {{ success_message }}
     </div>
-    <div class="form-group">
-        <label for="upload_function">Виберіть де оновити данні:</label>
-        <select name="upload_function" id="upload_function" class="form-control">
-            <option value="Choose processing function">Виберіть де оновити данні</option>
-            <option value="load_data_from_excel">Данні про студентів</option>
-            <option value="load_discipline_from_excel">Данні про дисципліни</option>
-            <option value="load_visiting_from_csv">Данні про відвідування</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Загрузити</button>
-</form>
-{% if success_message %}
-<div class="alert alert-success">{{ success_message }}</div>
-{% endif %}
+    {% endif %}
+</div>
 <form method="post" action="{% url 'flush_database' %}" class="d-inline">
     {% csrf_token %}
     <button type="submit" class="btn btn-danger btn-sm float-right">Очистити базу даних</button>

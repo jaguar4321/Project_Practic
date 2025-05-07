@@ -1,9 +1,50 @@
 from django.db import models
 from django.db import IntegrityError
 
+class Institute(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Назва інституту")
+    abbrev = models.CharField(max_length=255, verbose_name="Скорочена назва")
+
+    def __str__(self):
+        return self.name
+
+
+class Department(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Назва кафедри")
+    institute = models.ForeignKey(Institute, on_delete=models.CASCADE, related_name='departments',
+                                  verbose_name="Інститут")
+
+    def __str__(self):
+        return self.name
+
+
+class Specialty(models.Model):
+    name = models.CharField(max_length=255, verbose_name="Назва спеціальності")
+
+    def __str__(self):
+        return self.name
+
+
+class SpecialtyDepartment(models.Model):
+    specialty = models.ForeignKey(
+        Specialty, on_delete=models.CASCADE, related_name='departments', verbose_name="спеціальність"
+    )
+    department = models.ForeignKey(
+        Department, on_delete=models.CASCADE, related_name='specialties', verbose_name="Кафедра"
+    )
+
+    class Meta:
+        unique_together = ('specialty', 'department')
+
+    def __str__(self):
+        return f"{self.specialty} - {self.department}"
+
+
 class Group(models.Model):
     name = models.CharField(max_length=100, unique=True)
     year = models.CharField(max_length=100)
+    specialties = models.ManyToManyField(
+        SpecialtyDepartment, blank=True, related_name='groups', verbose_name="Спеціальності")
 
     def __str__(self):
         return self.name
@@ -14,6 +55,7 @@ class Discipline(models.Model):
     abbrev = models.CharField(max_length=100)
     groups = models.CharField(max_length=100)
     year = models.CharField(max_length=100)
+    total_time = models.IntegerField(max_length=20)
 
     def __str__(self):
         return self.name
@@ -36,25 +78,47 @@ class Lesson_visit(models.Model):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='visiting', default=None)
 
     def save(self, *args, **kwargs):
-        # Поиск студента по его email
         student = self.email
         if student:
-            # Получение группы студента
             group = student.group
             if group:
-                self.group = group  # Установка найденной группы в поле group
+                self.group = group
 
                 discipline_groups = [g.strip() for g in self.discipline.groups.split(',')]
                 if group.name not in discipline_groups:
-                    raise IntegrityError(f"Группа {group.name} не указана для дисциплины {self.discipline.name}.")
+                    raise IntegrityError(f"Дисципліна {self.discipline.name} не викладається для цієї групи {group.name}.")
+                if Lesson_visit.objects.filter(
+                        email=self.email,
+                        date=self.date,
+                        discipline=self.discipline,
+                        lesson=self.lesson,
+                        group=student.group
+                ):
+                    raise IntegrityError(
+                        "Запис із такою комбінацією студента, дати, дисципліни, виду заняття та групи вже існує."
+                    )
+
         super().save(*args, **kwargs)
 
     def course(self):
         return self.group.year
 
     def __str__(self):
-        return self.email
+        return f"{self.email}"
 
     class Meta:
-        unique_together = ('email', 'date', 'discipline', 'lesson')
+        unique_together = ('email', 'date', 'discipline', 'lesson', 'group')
+
+
+class LoadingData(models.Model):
+    class Meta:
+        verbose_name = "Loading Data"
+        verbose_name_plural = "Loading Data"
+
+
+
+
+
+
+
 

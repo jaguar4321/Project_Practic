@@ -1,0 +1,207 @@
+{% load static list_tags %}
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Звіт про відвідуваність</title>
+    <style>
+        /* Шрифт */
+        @font-face {
+            font-family: "DejaVu Sans";
+            src: url("{% static 'fonts/DejaVuSans.ttf' %}") format("truetype");
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* Основные стили */
+        body {
+            font-family: "DejaVu Sans", Arial, sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        /* Контейнер для дисциплины */
+        .discipline-container {
+            margin-bottom: 40px;
+            page-break-inside: avoid;
+        }
+
+        /* Контейнер для группы */
+        .group-container {
+            margin-bottom: 20px;
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            page-break-inside: auto;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 5px;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        th {
+            font-weight: bold;
+            background-color: #f2f2f2;
+        }
+
+        /* Заголовки дисциплины и группы */
+        .discipline-header {
+            font-size: 14px;
+            font-weight: bold;
+            text-align: left;
+            padding: 8px;
+            background-color: #e0e0e0;
+            border: none;
+            margin-bottom: 10px;
+        }
+
+        .group-header {
+            font-size: 13px;
+            font-weight: bold;
+            text-align: left;
+            padding: 8px;
+            background-color: #f0f0f0;
+            border: none;
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+
+        /* Сообщение об отсутствии записей */
+        .no-records {
+            font-size: 13px;
+            text-align: left;
+            padding: 8px;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        /* Узкий столбец № */
+        .number-column {
+            width: 30px;
+        }
+
+        /* Стили для дат и посещаемости */
+        .date-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+
+        /* Пустое пространство */
+        .spacer {
+            height: 20px;
+            display: block;
+        }
+
+        /* Определение рамок для xhtml2pdf */
+        @frame content {
+            left: 20px;
+            right: 20px;
+            top: 20px;
+            bottom: 20px;
+        }
+
+        /* Ориентация страницы */
+        @page portrait {
+            size: A4 portrait;
+            margin: 1cm;
+            @frame content {
+                left: 20px;
+                right: 20px;
+                top: 20px;
+                bottom: 20px;
+            }
+        }
+
+        @page landscape {
+            size: A4 landscape;
+            margin: 1cm;
+            @frame content {
+                left: 20px;
+                right: 20px;
+                top: 20px;
+                bottom: 20px;
+            }
+        }
+
+        /* Применение ориентации через классы */
+        .portrait-page {
+            -pdf-page: portrait;
+        }
+
+        .landscape-page {
+            -pdf-page: landscape;
+        }
+    </style>
+</head>
+<body>
+    <h1>Звіт про відвідуваність</h1>
+
+    {% if visits.exists %}
+        {% for disc_data in disciplines_data %}
+            {% for lesson in disc_data.lessons %}
+                <div class="discipline-container">
+                    <div class="discipline-header">{{ disc_data.discipline.name }} - {{ lesson }}</div>
+                    {% for group in disc_data.groups %}
+                        {% if group.discipline_id == disc_data.discipline.id %}
+                            <div class="group-container {% if group.date_lessons|length > 6 %}landscape-page{% else %}portrait-page{% endif %}">
+                                {% with has_valid_dates=group.date_lessons|has_lesson:lesson %}
+                                    {% if has_valid_dates %}
+                                        <div class="group-header">Група: {{ group.name }}</div>
+                                        <table>
+                                            <tr class="date-row">
+                                                <th class="number-column">№</th>
+                                                <th>Група</th>
+                                                <th>Студент</th>
+                                                {% for dl in group.date_lessons %}
+                                                    {% if dl.lesson == lesson %}
+                                                        <th>{{ dl.date|date:"d/m/Y" }}</th>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </tr>
+                                            {% for student in group.students %}
+                                                <tr>
+                                                    <td class="number-column">{{ forloop.counter }}</td>
+                                                    <td>{{ group.name }}</td>
+                                                    <td>{{ student.full_name }}</td>
+                                                    {% for dl in group.date_lessons %}
+                                                        {% if dl.lesson == lesson %}
+                                                            {% with key=dl.date|make_key:dl.lesson %}
+                                                                <td>{{ student.visit_marks|lookup:key }}</td>
+                                                            {% endwith %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    {% else %}
+                                        <div class="no-records">Група: {{ group.name }} - немає записів відвідувань</div>
+                                    {% endif %}
+                                {% endwith %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    <div class="spacer"></div>  
+                </div>
+            {% endfor %}
+        {% endfor %}
+    {% else %}
+        <p>Немає даних про відвідування.</p>
+    {% endif %}
+</body>
+</html>

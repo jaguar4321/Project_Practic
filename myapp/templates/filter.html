@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Фільтр відвідувань студентів
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <form method="get" class="mb-4">
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary me-15">Застосувати фільтр</button>
+        <a href="{% url 'add_visit' %}?{{ request.GET.urlencode }}" class="btn btn-primary">Додати відвідування</a>
+    </form>
+
+    {% if visits %}
+        <a href="?{{ request.GET.urlencode }}&download_pdf=true" class="mt-3" title="Завантажити звіт у форматі PDF" target="_blank">
+            <img src="{% static 'img/PDF.png' %}" alt="PDF" style="width: 42px; height: 42px;">
+        </a>
+        <a href="?{{ request.GET.urlencode }}&download_excel=true" class="mt-3" title="Завантажити звіт у форматі EXCEL">
+            <img src="{% static 'img/Excel.png' %}" alt="Excel" style="width: 42px; height: 42px;">
+        </a>
+        <div id="accordion">
+            {% for visit in visits %}
+                {% ifchanged visit.group.id visit.discipline.id %}
+                    {% if not forloop.first %}
+                        </tbody>
+                        </table>
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="card">
+                        <div class="card-header" id="heading_{{ visit.group.id }}_{{ visit.discipline.id }}">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
+                                        data-target="#collapse_{{ visit.group.id }}_{{ visit.discipline.id }}"
+                                        aria-expanded="false"
+                                        aria-controls="collapse_{{ visit.group.id }}_{{ visit.discipline.id }}">
+                                    {{ visit.group.name }} - {{ visit.discipline.name }}
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapse_{{ visit.group.id }}_{{ visit.discipline.id }}"
+                             class="collapse"
+                             aria-labelledby="heading_{{ visit.group.id }}_{{ visit.discipline.id }}"
+                             data-parent="#accordion">
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr>
+                                            <th>Студент</th>
+                                            <th>Дата</th>
+                                            <th>Заняття</th>
+                                            <th>Видалити</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                {% endifchanged %}
+                    <tr>
+                        <td>{{ visit.email }}</td>
+                        <td>{{ visit.date }}</td>
+                        <td>{{ visit.lesson }}</td>
+                        <td>
+                            <form method="post" action="{% url 'delete_visit' visit.id %}?{{ request.GET.urlencode }}">
+                                {% csrf_token %}
+                                <input type="hidden" name="student" value="{{ request.GET.student }}">
+                                <input type="hidden" name="group" value="{{ request.GET.group }}">
+                                <input type="hidden" name="course" value="{{ request.GET.course }}">
+                                <input type="hidden" name="discipline" value="{{ request.GET.discipline }}">
+                                <input type="hidden" name="date" value="{{ request.GET.date }}">
+                                <button type="submit" class="btn btn-danger btn-sm">-</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% if forloop.last %}
+                    </tbody>
+                    </table>
+                    </div>
+                </div> <!-- Закрываем последнюю карточку -->
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Немає відвідувань для відображення.</p>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block additional_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    $('.selectpicker').selectpicker();
+
+    function saveSelectedOrder(select) {
+        var selectId = select.attr('id') || select.attr('name');
+        var selectedValues = select.find('option:selected').map(function() {
+            return $(this).val();
+        }).get();
+        sessionStorage.setItem('selectOrder_' + selectId, JSON.stringify(selectedValues));
+    }
+
+    function restoreSelectedOrder(select) {
+        var selectId = select.attr('id') || select.attr('name');
+        var savedOrder = sessionStorage.getItem('selectOrder_' + selectId);
+        if (savedOrder) {
+            var selectedValues = JSON.parse(savedOrder);
+            var $options = select.find('option');
+            var $selectedOptions = $options.filter(function() {
+                return selectedValues.includes($(this).val());
+            });
+            var $unselectedOptions = $options.filter(function() {
+                return !selectedValues.includes($(this).val());
+            });
+
+            select.empty();
+            selectedValues.forEach(function(value) {
+                var $option = $selectedOptions.filter('[value="' + value + '"]');
+                select.append($option);
+            });
+            $unselectedOptions.each(function() {
+                select.append($(this));
+            });
+
+            select.selectpicker('refresh');
+        }
+    }
+
+    $('.selectpicker').each(function() {
+        restoreSelectedOrder($(this));
+    });
+
+    $('.selectpicker').on('changed.bs.select', function (e, clickedIndex, isSelected, previousValue) {
+        var $select = $(this);
+        var selectedOptions = $select.find('option:selected');
+
+        selectedOptions.each(function() {
+            var option = $(this);
+            option.detach();
+            $select.prepend(option);
+        });
+
+        saveSelectedOrder($select);
+        $select.selectpicker('refresh');
+    });
+});
+</script>
+{% endblock %}

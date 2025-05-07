@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Завантаження даних
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Завантажити файл</h1>
+
+    {% if errors %}
+    {% with has_errors=False %}
+        {% for key, value in errors.items %}
+            {% if value %}
+                {% if not has_errors %}
+                    <div class="alert alert-danger">
+                        <h4>Виникли помилки при обробці файлу:</h4>
+                        <ul>
+                    {% endif %}
+                    {% if key == 'file_errors' and value %}
+                        <li><strong>Помилки файлу:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'format_errors' and value %}
+                        <li><strong>Помилки формату файлу:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'discipline_errors' and value %}
+                        <li><strong>Помилки дисципліни:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'student_errors' and value %}
+                        <li><strong>Помилки студентів:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'visit_errors' and value %}
+                        <li><strong>Помилки відвідувань:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'archive_errors' and value %}
+                        <li><strong>Помилки архіву:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+
+                    {% if key == 'cleanup_errors' and value %}
+                        <li><strong>Помилки очищення:</strong>
+                            <ul>
+                                {% for error in value %}
+                                <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    {% endif %}
+                    {% if not has_errors %}
+                        {% with has_errors=True %}{% endwith %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if has_errors %}
+                        </ul>
+                    </div>
+            {% endif %}
+        {% endwith %}
+    {% endif %}
+
+    <form action="{% url 'loading_data_user' %}" method="post" enctype="multipart/form-data" class="mt-4">
+        {% csrf_token %}
+        <div class="form-group mb-3">
+            {{ form.folder.label_tag }}
+            {{ form.folder }}
+            {% if form.folder.errors %}
+            <div class="text-danger">
+                {{ form.folder.errors }}
+            </div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary">Завантажити</button>
+    </form>
+
+    {% if success_message %}
+    <div class="alert alert-success mt-4">
+        {{ success_message }}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
