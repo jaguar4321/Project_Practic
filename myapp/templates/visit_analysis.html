@@ -20,8 +20,7 @@
 
 {% block additional_scripts %}
 <script>
-$(document).ready(function() {
-    // Инициализируем selectpicker
+document.addEventListener('DOMContentLoaded', function() {
     $('.selectpicker').selectpicker();
 
     // Функция для сохранения порядка выбранных элементов в sessionStorage
