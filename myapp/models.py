@@ -8,6 +8,9 @@ class Institute(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Інститут"
+        verbose_name_plural = "Інститути"
 
 class Department(models.Model):
     name = models.CharField(max_length=255, verbose_name="Назва кафедри")
@@ -17,6 +20,9 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Кафедра"
+        verbose_name_plural = "Кафедри"
 
 class Specialty(models.Model):
     name = models.CharField(max_length=255, verbose_name="Назва спеціальності")
@@ -24,10 +30,13 @@ class Specialty(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Спеціальність"
+        verbose_name_plural = "Спеціальності"
 
 class SpecialtyDepartment(models.Model):
     specialty = models.ForeignKey(
-        Specialty, on_delete=models.CASCADE, related_name='departments', verbose_name="спеціальність"
+        Specialty, on_delete=models.CASCADE, related_name='departments', verbose_name="Спеціальність"
     )
     department = models.ForeignKey(
         Department, on_delete=models.CASCADE, related_name='specialties', verbose_name="Кафедра"
@@ -35,10 +44,11 @@ class SpecialtyDepartment(models.Model):
 
     class Meta:
         unique_together = ('specialty', 'department')
+        verbose_name = "Спеціальність Кафедри"
+        verbose_name_plural = "Спеціальності Кафедр"
 
     def __str__(self):
         return f"{self.specialty} - {self.department}"
-
 
 class Group(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -49,17 +59,23 @@ class Group(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Група"
+        verbose_name_plural = "Групи"
 
 class Discipline(models.Model):
     name = models.CharField(max_length=100)
     abbrev = models.CharField(max_length=100)
     groups = models.CharField(max_length=100)
     year = models.CharField(max_length=100)
-    total_time = models.IntegerField(max_length=20)
+    total_time = models.IntegerField()
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name = "Дисципліна"
+        verbose_name_plural = "Дисципліни"
 
 class Student(models.Model):
     full_name = models.CharField(max_length=200)
@@ -69,6 +85,9 @@ class Student(models.Model):
     def __str__(self):
         return self.full_name
 
+    class Meta:
+        verbose_name = "Студент"
+        verbose_name_plural = "Студенти"
 
 class Lesson_visit(models.Model):
     email = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='visiting')
@@ -108,17 +127,10 @@ class Lesson_visit(models.Model):
 
     class Meta:
         unique_together = ('email', 'date', 'discipline', 'lesson', 'group')
-
+        verbose_name = "Відвідування Заняття"
+        verbose_name_plural = "Відвідування Занять"
 
 class LoadingData(models.Model):
     class Meta:
-        verbose_name = "Loading Data"
-        verbose_name_plural = "Loading Data"
-
-
-
-
-
-
-
-
+        verbose_name = "Завантаження Даних"
+        verbose_name_plural = "Завантаження Даних"
