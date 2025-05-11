@@ -6,21 +6,27 @@ Students List
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">Groups</h1>
+    <h1 class="mb-4">Список груп з студентами</h1>
     <div id="accordion">
         {% for group in groups %}
         <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">{{ group.name }} - курс {{ group.year }}</h5>
+            <div class="card-header" id="heading{{ group.id }}">
+                <h5 class="mb-0">
+                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapse{{ group.id }}" aria-expanded="true" aria-controls="collapse{{ group.id }}">
+                        {{ group.name }} - курс {{ group.year }}
+                    </button>
+                </h5>
             </div>
-            <div class="card-body">
-                <ul class="list-group">
-                    {% for student in students %}
-                    {% if student.group == group %}
-                    <li class="list-group-item">{{ student.full_name }} - {{ student.email }}</li>
-                    {% endif %}
-                    {% endfor %}
-                </ul>
+            <div id="collapse{{ group.id }}" class="collapse" aria-labelledby="heading{{ group.id }}" data-parent="#accordion">
+                <div class="card-body">
+                    <ul class="list-group">
+                        {% for student in students %}
+                        {% if student.group == group %}
+                        <li class="list-group-item">{{ student.full_name }} - {{ student.email }}</li>
+                        {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
         {% endfor %}
