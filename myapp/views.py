@@ -327,6 +327,8 @@ def lesson_visit_filter(request):
             visits = visits.filter(date__range=(date_from, date_to))
         elif date_from:
             visits = visits.filter(date=date_from)
+        elif date_to:
+            visits = visits.filter(date__lte=date_to)
 
 
         if specialty:
@@ -389,6 +391,8 @@ def visit_analysis(request):
             visits = visits.filter(date__range=(date_from, date_to))
         elif date_from:
             visits = visits.filter(date=date_from)
+        elif date_to:
+            visits = visits.filter(date__lte=date_to)
 
         if specialty:
             specialty_groups = Group.objects.filter(specialties__in=specialty)
